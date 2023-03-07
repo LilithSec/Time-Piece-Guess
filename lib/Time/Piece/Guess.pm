@@ -3,50 +3,180 @@ package Time::Piece::Guess;
 use 5.006;
 use strict;
 use warnings;
+use Time::Piece;
 
 =head1 NAME
 
-Time::Piece::Guess - The great new Time::Piece::Guess!
+Time::Piece::Guess - Compares the passed string against common patterns and returns a format to use with Time::Piece or object
 
 =head1 VERSION
 
-Version 0.01
+Version 0.0.1
 
 =cut
 
 our $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use Time::Piece::Guess;
+    use Time::Piece;
 
-    my $foo = Time::Piece::Guess->new();
-    ...
+    my $format = Time::Piece::Guess->guess('2023-02-27T11:00:18');
+    my $tp_object;
+    if (!defined( $format )){
+        print "No matching format found\n";
+    }else{
+        $tp_object = Time::Piece->strptime( '2023-02-27T11:00:18' , $format );
+    }
 
-=head1 EXPORT
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    $tp_objectobject = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
+    if (!defined( $tp_objectobject )){
+        print "No matching format found\n";
+    }
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
-=head2 function1
+=head2 guess
+
+Compares it against various patterns and returns the matching string for use with
+parsing that format.
+
+If one can't be matched, undef is returned.
+
+This will attempt to remove microseconds as below.
+
+    $string =~ s/\.\d+$//;
+    $string =~ s/\.\d+([\-\+]\d+)$/$1/;
 
 =cut
 
-sub function1 {
+sub guess {
+	my $string = $_[1];
+
+	if ( !defined($string) ) {
+		return undef;
+	}
+
+	# remove micro seconds if they are present
+	$string =~ s/\.\d+$//;
+	$string =~ s/\.\d+([\-\+]\d+)$/$1/;
+
+	my $format;
+	if ( $string =~ /^\d+$/ ) {
+		$format = '%s';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%d %H:%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%d %H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%dT%H:%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%dT%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%dT%H:%M%Z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%d/%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%d %H:%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%d %H:%M:%S%z';
+	}
+	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%dT%H:%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%dT%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%dT%H:%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%d/%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y-%m-%d %H:%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y-%m-%d %H:%M:%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y-%m-%dT%H:%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y-%m-%dT%H:%M:%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y-%m-%dT%H:%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y-%m-%d/%H:%M:%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y%m%d %H:%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y%m%d %H:%M:%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y%m%dT%H:%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y%m%dT%H:%M:%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y%m%dT%H:%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+		$format = '%Y%m%d/%H:%M:%S';
+	}
+
+	return $format;
 }
 
-=head2 function2
+=head2 guess_to_obj
+
+Takes the string, calles guess on it. If it gets a hit, it then returns
+the Time::Piece object.
+
+If it fails, undef is returned.
+
+    $tp_objectobject = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
+    if (!defined( $tp_objectobject )){
+        print "No matching format found\n";
+    }
 
 =cut
 
-sub function2 {
+sub guess_to_obj {
+	my $string = $_[1];
+
+	if ( !defined($string) ) {
+		return undef;
+	}
+
+	my $format = Time::Piece::Guess->guess($string);
+
+	if ( !defined($format) ) {
+		return undef;
+	}
+
+	my $t;
+	eval { $t = Time::Piece->strptime( $string, $format ); };
+	if ($@) {
+		return undef;
+	}
+
+	return $t;
 }
 
 =head1 AUTHOR
@@ -102,4 +232,4 @@ This is free software, licensed under:
 
 =cut
 
-1; # End of Time::Piece::Guess
+1;    # End of Time::Piece::Guess
