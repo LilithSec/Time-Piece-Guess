@@ -15,7 +15,7 @@ Version 0.0.1
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.0.1';
 
 =head1 SYNOPSIS
 
@@ -30,9 +30,8 @@ our $VERSION = '0.01';
         $tp_object = Time::Piece->strptime( '2023-02-27T11:00:18' , $format );
     }
 
-
-    $tp_objectobject = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
-    if (!defined( $tp_objectobject )){
+    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
+    if (!defined( $tp_object )){
         print "No matching format found\n";
     }
 
@@ -47,8 +46,7 @@ If one can't be matched, undef is returned.
 
 This will attempt to remove microseconds as below.
 
-    $string =~ s/\.\d+$//;
-    $string =~ s/\.\d+([\-\+]\d+)$/$1/;
+    $string =~ s/\.\d+//;
 
 =cut
 
@@ -70,38 +68,74 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H:%M%z';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%d %H:%MZ';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%d %H:%M:%SZ';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M%z';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%dT%H:%MZ';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%dT%H:%M:%SZ';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M%Z';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%dT%H:%MZ';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%d/%H:%M:%SZ';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H:%M%z';
 	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y%m%d %H:%M%Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y%m%d %H:%M:%SZ';
 	}
 	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M%z';
 	}
+	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y%m%dT%H:%MZ';
+	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y%m%dT%H:%M:%SZ';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M%z';
 	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y%m%dT%H:%MZ';
+	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d/%H:%M:%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+		$format = '%Y%m%d/%H:%M:%SZ';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d %H:%M';
@@ -139,6 +173,115 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%d/%H:%M:%S';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%d %H%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%d %H%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%d %H%M%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%d %H%M%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%dT%H%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%dT%H%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%dT%H%M%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%dT%H%M%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%dT%H%M%Z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%dT%H%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y-%m-%d/%H%M%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y-%m-%d/%H%M%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%d %H%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y%m%d %H%M%Z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%d %H%M%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y%m%d %H%M%SZ';
+	}
+	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%dT%H%M%z';
+	}
+	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y%m%dT%H%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%dT%H%M%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y%m%dT%H%M%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%dT%H%M%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y%m%dT%H%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+		$format = '%Y%m%d/%H%M%S%z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+		$format = '%Y%m%d/%H%M%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]$/ ) {
+		$format = '%Y-%m-%d %H%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+		$format = '%Y-%m-%d %H%M%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]$/ ) {
+		$format = '%Y-%m-%dT%H%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+		$format = '%Y-%m-%dT%H%M%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]$/ ) {
+		$format = '%Y-%m-%dT%H%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+		$format = '%Y-%m-%d/%H%M%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9]$/ ) {
+		$format = '%Y%m%d %H%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+		$format = '%Y%m%d %H%M%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9]$/ ) {
+		$format = '%Y%m%dT%H%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+		$format = '%Y%m%dT%H%M%S';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9]$/ ) {
+		$format = '%Y%m%dT%H%M';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+		$format = '%Y%m%d/%H%M%S';
+
+	}
 
 	return $format;
 }
@@ -150,8 +293,8 @@ the Time::Piece object.
 
 If it fails, undef is returned.
 
-    $tp_objectobject = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
-    if (!defined( $tp_objectobject )){
+    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
+    if (!defined( $tp_object )){
         print "No matching format found\n";
     }
 
