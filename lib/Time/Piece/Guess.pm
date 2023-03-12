@@ -22,7 +22,12 @@ our $VERSION = '0.0.1';
     use Time::Piece::Guess;
     use Time::Piece;
 
-    my $format = Time::Piece::Guess->guess('2023-02-27T11:00:18');
+    my $string='2023-02-27T11:00:18.33';
+    my ($format, $ms_clean_regex) = Time::Piece::Guess->guess('2023-02-27T11:00:18');
+    # apply the regex if needed
+    if (defined( $ms_clean_regex )){
+        $string=~s/$ms_clean_regex//;
+    }
     my $tp_object;
     if (!defined( $format )){
         print "No matching format found\n";
@@ -42,11 +47,24 @@ our $VERSION = '0.0.1';
 Compares it against various patterns and returns the matching string for use with
 parsing that format.
 
-If one can't be matched, undef is returned.
+If one can't be matched, undef is returned. Two values are returned. The first is the format
+of it and the second is a regexp to remove microseconds if needed.
 
 This will attempt to remove microseconds as below.
 
-    $string =~ s/\.\d+//;
+    my $string='2023-02-27T11:00:18.33';
+    my ($format, $ms_clean_regex) = Time::Piece::Guess->guess('2023-02-27T11:00:18');
+    # apply the regex if needed
+    if (defined( $ms_clean_regex )){
+        $string=~s/$ms_clean_regex//;
+    }
+    my $tp_object;
+    if (!defined( $format )){
+        print "No matching format found\n";
+    }else{
+        $tp_object = Time::Piece->strptime( '2023-02-27T11:00:18' , $format );
+    }
+
 
 =cut
 
@@ -58,8 +76,11 @@ sub guess {
 	}
 
 	# remove micro seconds if they are present
-	$string =~ s/\.\d+$//;
-	$string =~ s/\.\d+([\-\+]\d+)$/$1/;
+	my $regex;
+	if ($string =~ /\.\d+/) {
+		$regex=qr/\.\d+/;
+		$string=~s/$regex//;
+	}
 
 	my $format;
 	if ( $string =~ /^\d+$/ ) {
@@ -71,11 +92,17 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H:%MZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%d %H:%M %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H:%M:%S%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H:%M:%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%d %H:%M:%S %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M%z';
@@ -83,17 +110,26 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H:%MZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%dT%H:%M %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%S%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%SZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%dT%H:%M:%S %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
-		$format = '%Y-%m-%dT%H:%M%Z';
+		$format = '%Y-%m-%dT%H:%M%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H:%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%dT%H:%M %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%S%z';
@@ -101,11 +137,17 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%SZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%d/%H:%M:%S %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H:%M%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d %H:%M%Z';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y%m%d %H:%M %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H:%M:%S%z';
@@ -113,11 +155,17 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d %H:%M:%SZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y%m%d %H:%M:%S %Z';
+	}
 	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M%z';
 	}
 	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H:%MZ';
+	}
+	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y%m%dT%H:%M %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M:%S%z';
@@ -125,17 +173,26 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H:%M:%SZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y%m%dT%H:%M:%S %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H:%MZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y%m%dT%H:%M %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d/%H:%M:%S%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d/%H:%M:%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+		$format = '%Y%m%d/%H:%M:%S %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d %H:%M';
@@ -179,11 +236,17 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H%MZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%d %H%M %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H%M%S%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H%M%SZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%d %H%M%S %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H%M%z';
@@ -191,17 +254,26 @@ sub guess {
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H%MZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%dT%H%M %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H%M%S%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H%M%SZ';
 	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%dT%H%M%S %Z';
+	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
-		$format = '%Y-%m-%dT%H%M%Z';
+		$format = '%Y-%m-%dT%H%M%z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H%MZ';
+	}
+	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]\ .+$/ ) {
+		$format = '%Y-%m-%dT%H%M %Z';
 	}
 	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d/%H%M%S%z';
@@ -283,7 +355,7 @@ sub guess {
 
 	}
 
-	return $format;
+	return $format, $regex;
 }
 
 =head2 guess_to_obj
