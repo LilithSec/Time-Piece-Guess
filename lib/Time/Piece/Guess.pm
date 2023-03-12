@@ -11,11 +11,11 @@ Time::Piece::Guess - Compares the passed string against common patterns and retu
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -358,7 +358,7 @@ sub guess {
 	return $format, $regex;
 }
 
-=head2 guess_to_obj
+=head2 guess_to_object
 
 Takes the string, calles guess on it. If it gets a hit, it then returns
 the Time::Piece object.
@@ -372,7 +372,7 @@ If it fails, undef is returned.
 
 =cut
 
-sub guess_to_obj {
+sub guess_to_object {
 	my $string = $_[1];
 
 	if ( !defined($string) ) {
