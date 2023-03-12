@@ -38,9 +38,18 @@ eval {
 			die('Failed to create a Time::Piece object using the returned format');
 		}
     }
+
+	my $obj=Time::Piece::Guess->guess_to_object($string);
+	if ($@) {
+		die('Died calling guess_to_object... '.$@);
+	}
+	if (!defined($obj)) {
+		die('Returned undef from guess_to_object');
+	}
+
 	$worked=1;
 };
-ok( $worked eq '1', 'load all' ) or diag( $@ );
+ok( $worked eq '1', 'run some basic tests' ) or diag( $@ );
 
 
 plan tests => $tests_ran;
