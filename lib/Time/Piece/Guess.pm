@@ -379,11 +379,15 @@ sub guess_to_object {
 		return undef;
 	}
 
-	my $format = Time::Piece::Guess->guess($string);
+	my ($format, $ms_clean_regex) = Time::Piece::Guess->guess($string);
 
 	if ( !defined($format) ) {
 		return undef;
 	}
+
+	if (defined( $ms_clean_regex )){
+        $string=~s/$ms_clean_regex//;
+    }
 
 	my $t;
 	eval { $t = Time::Piece->strptime( $string, $format ); };
