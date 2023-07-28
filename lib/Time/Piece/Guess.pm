@@ -386,7 +386,7 @@ sub guess_to_object {
 	}
 
 	if ($make_local) {
-		$t->[10] = 0;
+		$t->[10] = 1;
 	}
 
 	return $t;
