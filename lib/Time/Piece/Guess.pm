@@ -77,286 +77,197 @@ sub guess {
 
 	# remove micro seconds if they are present
 	my $regex;
-	if ($string =~ /\.\d+/) {
-		$regex=qr/\.\d+/;
-		$string=~s/$regex//;
+	if ( $string =~ /\.\d+/ ) {
+		$regex = qr/\.\d+/;
+		$string =~ s/$regex//;
 	}
 
 	my $format;
 	if ( $string =~ /^\d+$/ ) {
 		$format = '%s';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H:%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H:%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%d %H:%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H:%M:%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H:%M:%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%d %H:%M:%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H:%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%dT%H:%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H:%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H:%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%dT%H:%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H:%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d %H:%M%Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y%m%d %H:%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H:%M:%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d %H:%M:%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y%m%d %H:%M:%S %Z';
-	}
-	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M%z';
-	}
-	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H:%MZ';
-	}
-	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y%m%dT%H:%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M:%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H:%M:%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y%m%dT%H:%M:%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H:%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H:%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y%m%dT%H:%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d/%H:%M:%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d/%H:%M:%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]\ .+$/ ) {
 		$format = '%Y%m%d/%H:%M:%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d %H:%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d %H:%M:%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%dT%H:%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%dT%H:%M:%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%dT%H:%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d/%H:%M:%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%d %H:%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%d %H:%M:%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%dT%H:%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%dT%H:%M:%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%dT%H:%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9]\:[0-5][0-9]\:[0-5][0-9]$/ ) {
 		$format = '%Y%m%d/%H:%M:%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%d %H%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d %H%M%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d %H%M%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%d %H%M%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%dT%H%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H%M%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H%M%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%dT%H%M%S %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%dT%H%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%dT%H%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]\ .+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]\ .+$/ ) {
 		$format = '%Y-%m-%dT%H%M %Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y-%m-%d/%H%M%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y-%m-%d/%H%M%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d %H%M%Z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d %H%M%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d %H%M%SZ';
-	}
-	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H%M%z';
-	}
-	elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /\^d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H%M%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H%M%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%dT%H%M%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y%m%dT%H%MZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9][-+]\d+$/ ) {
 		$format = '%Y%m%d/%H%M%S%z';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]Z$/ ) {
 		$format = '%Y%m%d/%H%M%SZ';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d %H%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d %H%M%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9]$/ ) {
 		$format = '%Y-%m-%dT%H%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
 		$format = '%Y-%m-%dT%H%M%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9]$/ ) {
 		$format = '%Y-%m-%dT%H%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\-\d\d-\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
 		$format = '%Y-%m-%d/%H%M%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9]$/ ) {
 		$format = '%Y%m%d %H%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\ [0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
 		$format = '%Y%m%d %H%M%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9]$/ ) {
 		$format = '%Y%m%dT%H%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\dT[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
 		$format = '%Y%m%dT%H%M%S';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9]$/ ) {
 		$format = '%Y%m%dT%H%M';
-	}
-	elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
+	} elsif ( $string =~ /^\d\d\d\d\d\d\d\d\/[0-2][0-9][0-5][0-9][0-5][0-9]$/ ) {
 		$format = '%Y%m%d/%H%M%S';
 
 	}
 
 	return $format, $regex;
-}
+} ## end sub guess
 
 =head2 guess_to_object
 
@@ -373,21 +284,95 @@ If it fails, undef is returned.
 =cut
 
 sub guess_to_object {
-	my $string = $_[1];
+	my $string  = $_[1];
+	my $special = $_[2];
 
 	if ( !defined($string) ) {
 		return undef;
 	}
 
-	my ($format, $ms_clean_regex) = Time::Piece::Guess->guess($string);
+	# if special is enabled and it looks like a now special
+	# return the current time with the diffence applied
+	if (
+		$special
+		&& (   $string =~ /^now$/
+			|| $string =~ /^now[\-\+]\d+[mhdw]?$/
+			|| $string =~ /^[\-\+]\d+[mhdw]?$/ )
+		)
+	{
+		my $t = localtime;
+
+		# if just now, it is asking for the current time, so just return that
+		if ( $string eq 'now' ) {
+			return $t;
+		}
+
+		# since this is more than just now, remove the now part and proceed to
+		# figure out what the off set is
+		$string =~ s/^now//;
+
+		# figure out what to multiply the offset by
+		# nothing, seconds
+		my $multiplier = 1;
+		if ( $string =~ /m$/ ) {
+			# minutes
+			$multiplier = 60;
+			$string =~ s/m$//;
+		} elsif ( $string =~ /h$/ ) {
+			# hours
+			$multiplier = 60 * 60;
+			$string =~ s/h$//;
+		} elsif ( $string =~ /d$/ ) {
+			# days
+			$multiplier = 60 * 60 * 24;
+			$string =~ s/d$//;
+		} elsif ( $string =~ /w$/ ) {
+			# weeks
+			$multiplier = 60 * 60 * 24 * 7;
+			$string =~ s/w$//;
+		}
+
+		# figure out the direction we are going
+		# multiply it
+		# apply the offset
+		if ( $string =~ /^\-/ ) {
+			$string =~ s/^\-//;
+			$string = $string * $multiplier;
+			$t      = $t - $string;
+		} else {
+			$string =~ s/^\+//;
+			$string = $string * $multiplier;
+			$t      = $t + $string;
+		}
+
+		return $t;
+	} ## end if ( $special && ( $string =~ /^now$/ || $string...))
+
+	# if special is enabled and ZZ or zz is used at the end
+	# append the timezone abbreviation
+	if (   $special
+		&& $string =~ /zz$/ )
+	{
+		my $t      = localtime;
+		my $offset = $t->strftime("%z");
+		$string =~ s/zz$/$offset/;
+	} elsif ( $special
+		&& $string =~ /ZZ$/ )
+	{
+		my $t      = localtime;
+		my $offset = $t->strftime("%Z");
+		$string =~ s/\ ?ZZ$/\ $offset/;
+	}
+
+	my ( $format, $ms_clean_regex ) = Time::Piece::Guess->guess($string);
 
 	if ( !defined($format) ) {
 		return undef;
 	}
 
-	if (defined( $ms_clean_regex )){
-        $string=~s/$ms_clean_regex//;
-    }
+	if ( defined($ms_clean_regex) ) {
+		$string =~ s/$ms_clean_regex//;
+	}
 
 	my $t;
 	eval { $t = Time::Piece->strptime( $string, $format ); };
@@ -396,7 +381,7 @@ sub guess_to_object {
 	}
 
 	return $t;
-}
+} ## end sub guess_to_object
 
 =head1 AUTHOR
 
