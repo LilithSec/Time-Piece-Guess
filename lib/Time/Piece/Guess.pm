@@ -274,9 +274,11 @@ sub guess {
 Takes the string, calles guess on it. If it gets a hit, it then returns
 the Time::Piece object.
 
+Optionally there is the option to enable specials as well.
+
 If it fails, undef is returned.
 
-    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
+    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18', 0);
     if (!defined( $tp_object )){
         print "No matching format found\n";
     }
@@ -350,18 +352,21 @@ sub guess_to_object {
 
 	# if special is enabled and ZZ or zz is used at the end
 	# append the timezone abbreviation
+	my $make_local = 0;
 	if (   $special
 		&& $string =~ /zz$/ )
 	{
-		my $t      = localtime;
-		my $offset = $t->strftime("%z");
-		$string =~ s/zz$/$offset/;
+		my $t    = localtime;
+		my $zone = $t->strftime("%z");
+		$string =~ s/zz$/$zone/;
+		$make_local = 1;
 	} elsif ( $special
 		&& $string =~ /ZZ$/ )
 	{
-		my $t      = localtime;
-		my $offset = $t->strftime("%Z");
-		$string =~ s/\ ?ZZ$/\ $offset/;
+		my $t    = localtime;
+		my $zone = $t->strftime("%Z");
+		$string =~ s/\ ?ZZ$/\ $zone/;
+		$make_local = 1;
 	}
 
 	my ( $format, $ms_clean_regex ) = Time::Piece::Guess->guess($string);
@@ -378,6 +383,10 @@ sub guess_to_object {
 	eval { $t = Time::Piece->strptime( $string, $format ); };
 	if ($@) {
 		return undef;
+	}
+
+	if ($make_local) {
+		$t->[10] = 0;
 	}
 
 	return $t;
