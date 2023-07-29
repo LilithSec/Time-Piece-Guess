@@ -11,11 +11,11 @@ Time::Piece::Guess - Compares the passed string against common patterns and retu
 
 =head1 VERSION
 
-Version 0.4.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
