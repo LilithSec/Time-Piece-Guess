@@ -11,11 +11,11 @@ Time::Piece::Guess - Compares the passed string against common patterns and retu
 
 =head1 VERSION
 
-Version 0.0.3
+Version 0.4.0
 
 =cut
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.4.0';
 
 =head1 SYNOPSIS
 
@@ -274,14 +274,20 @@ sub guess {
 Takes the string, calles guess on it. If it gets a hit, it then returns
 the Time::Piece object.
 
-Optionally there is the option to enable specials as well.
+Optionally there is the option to enable specials as well. See the section
+on specials further down.
 
 If it fails, undef is returned.
 
-    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18', 0);
+    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18');
     if (!defined( $tp_object )){
         print "No matching format found\n";
     }
+
+The same thing, but enabling specials and, resulting in it appending the local timezone
+offset data that would correspond to %z.
+
+    $tp_object = Time::Piece::Guess->guess_to_object('2023-02-27T11:00:18zz', 1);
 
 =cut
 
@@ -385,12 +391,46 @@ sub guess_to_object {
 		return undef;
 	}
 
+	# unfortunately Time::Piece lakes the ability to set this currently
 	if ($make_local) {
 		$t->[10] = 1;
 	}
 
 	return $t;
 } ## end sub guess_to_object
+
+=head1 SPECIAL FORMATS
+
+=head2 now
+
+Now is returns current time.
+
+=head2 now[-+]\d+[mhdw]?
+
+Returns the current time after adding or subtracting the specified number of seconds.
+
+The following may be applied to the end to act as a multipler.
+
+    - m :: The specified number is minutes.
+
+    - h :: The specified number is hours.
+
+    - d :: The specified number is hours.
+
+    - w :: The specified number is weeks.
+
+So 'now-5' would be now minus five seconds and 'now-5m' would be now minus five minutes.
+
+=head2 zz
+
+Apply the current time zone to the end prior to parsing. Offset is determined by %z.
+
+'2023-07-23T17:34:00zz' if in -0500 would become '2023-07-23T17:34:00-0500'.
+
+=head2 ZZ
+
+Apply the current time zone name to the end prior to parsing. The name is determined
+by %Z.
 
 =head1 AUTHOR
 
