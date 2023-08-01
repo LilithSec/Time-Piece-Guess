@@ -11,11 +11,11 @@ Time::Piece::Guess - Compares the passed string against common patterns and retu
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 =head1 SYNOPSIS
 
@@ -63,6 +63,14 @@ This will attempt to remove microseconds as below.
         print "No matching format found\n";
     }else{
         $tp_object = Time::Piece->strptime( '2023-02-27T11:00:18' , $format );
+    }
+
+
+Worth noting that Time::Piece as of the writing of this has a bug in which if just hours
+are present for %z and minutes are not it will error.
+
+    if ($format =~ /\%z/ && $string =~ /[-+]\d\d$/) {
+        sstring=$string.'00';
     }
 
 
@@ -383,6 +391,13 @@ sub guess_to_object {
 
 	if ( defined($ms_clean_regex) ) {
 		$string =~ s/$ms_clean_regex//;
+	}
+
+	# append 00 for minutes if %z is on the end
+	# as Time::Piece does not handle it properly if it
+	# is just hours
+	if ($format =~ /\%z/ && $string =~ /[-+]\d\d$/) {
+		$string=$string.'00';
 	}
 
 	my $t;
